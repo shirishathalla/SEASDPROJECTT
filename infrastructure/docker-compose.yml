@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: docuvault_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: docuvault
+      POSTGRES_USER: docuvault_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_vault_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docuvault_admin -d docuvault"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: docuvault_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://docuvault_admin:secure_vault_pass@db:5432/docuvault
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-docuvault_master_secret_2026}
+    volumes:
+      - ../backend:/app
+
+volumes:
+  postgres_data:

@@ -1,0 +1,10 @@
+{
+  "name": "DocuVault — AI-Powered Digital Document Wallet",
+  "description": "Privacy-first personal digital document wallet with AES-256-GCM encryption, OCR intelligence, expiry tracking, and Gemini-powered smart assistant.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
